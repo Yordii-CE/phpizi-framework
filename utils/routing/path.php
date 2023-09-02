@@ -44,11 +44,8 @@ class Path
     {
         $BASE_URL = 'http://' . $_SERVER['HTTP_HOST'];
         $projectPath = dirname($_SERVER['SCRIPT_NAME']);
-        $projectName = $projectPath;
 
-        $BASE_URL .= '/' . $projectName;
-
-        return $BASE_URL;
+        return $BASE_URL . $projectPath;
     }
 
     static function appendIfNotEmpty($path, $char)
