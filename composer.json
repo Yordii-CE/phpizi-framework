@@ -1,0 +1,6 @@
+{
+  "name": "yordii-ce/phpizi",
+  "description": "MVC framework for PHP based on ASP MVC features",
+  "license": "MIT",
+  "require": {}
+}
