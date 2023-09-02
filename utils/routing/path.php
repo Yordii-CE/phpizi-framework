@@ -44,7 +44,7 @@ class Path
     {
         $BASE_URL = 'http://' . $_SERVER['HTTP_HOST'];
         $projectPath = dirname($_SERVER['SCRIPT_NAME']);
-        $projectName = basename($projectPath);
+        $projectName = $projectPath;
 
         $BASE_URL .= '/' . $projectName;
 
