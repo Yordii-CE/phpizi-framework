@@ -1,38 +1,78 @@
 <?php
 
+namespace Framework\Core;
+
+use Framework\Utils\Url\DefaultUrl;
+use Framework\Utils\Url\InputUrl;
+use Framework\Utils\Url\UsingUrl;
+use Framework\Utils\Routing\Path;
+use Framework\Definitions\Exceptions\ControllerException;
+use Framework\Definitions\Exceptions\ApiException;
+use Framework\Response\Json;
+use Framework\Response\View;
+use Framework\Request\Body;
+use Framework\Definitions\Abstracts\Redirect;
+use Framework\Utils\Reflection\ControllerReflection;
+use Framework\Utils\Reflection\ActionReflection;
+use Framework\Utils\Reflection\ModelReflection;
+use Framework\Utils\Routing\NamespaceManager;
+
 class Program
 {
     private static $controllerReflection;
     private static $actionReflection;
+    private static $modelReflection;
+
+    public static function getControllerInstance($controllerClass)
+    {
+        //Load models
+        $models = Program::$controllerReflection->getConstructorModels(); //If is empty, model has same name controller
+        $modelInstances = [];
+        foreach ($models as $model) {
+            $modelClass = $model['type'];
+
+            //Load Database
+            Program::$modelReflection = new ModelReflection($modelClass);
+            $databases = Program::$modelReflection->getConstructorDatabases();
+            $databaseInstances = [];
+            foreach ($databases as $database) {
+                $databaseClass = $database['type'];
+                $databaseInstance =  new $databaseClass;
+                array_push($databaseInstances, $databaseInstance);
+            }
+
+            $modelInstance = new $modelClass(...$databaseInstances);
+            array_push($modelInstances, $modelInstance);
+        }
+
+        return new $controllerClass(...$modelInstances);
+    }
 
     public static function start()
     {
         try {
             //url_debug();
 
-            if (!DefaultUrl::validatePatternFormat()) throw new Exception("Wrong default url format by default");
+            if (!DefaultUrl::validatePatternFormat()) throw new \Exception("Wrong default url format by default");
 
-            $defaultUrl = DefaultUrl::getUrl();
-            $inputUrl = InputUrl::getUrl();
-            $usingUrl = InputUrl::parseUrl($inputUrl, $defaultUrl);
+            $defaultUrl = DefaultUrl::getComponents();
+            $inputUrl = InputUrl::getComponents();
+            $usingUrl = UsingUrl::parseComponents($inputUrl, $defaultUrl);
 
-            $controllerName = $usingUrl->controller;
+            $controllerClass = NamespaceManager::$controllers . $usingUrl->controller;
             $actionName = $usingUrl->action;
 
-            //Check controller
-            if (!file_exists(Path::getPathController($controllerName))) throw new ControllerException("'$controllerName' controller not found");
-            require_once Path::getPathController($controllerName);
+            //Controller 
+            if (!file_exists(str_replace('\\', '/', $controllerClass . '.php'))) throw new ControllerException("'$controllerClass' controller not found");
+            Program::$controllerReflection = new ControllerReflection($controllerClass);
 
-            $controllerClassName = $controllerName . "Controller";
-            $controller = new $controllerClassName();
-
-            Program::$controllerReflection = new ControllerReflectionUtils($controllerClassName);
+            $controller = Program::getControllerInstance($controllerClass);
 
             //Check action
 
             if (Program::$controllerReflection->isApi()) {
                 //Es un Api 
-                // $inputUrl->action = '';
+
                 if (empty($inputUrl->action)) {
                     //No hay Action                    
                     if (!empty($inputUrl->actionPrefix)) {
@@ -47,7 +87,7 @@ class Program
                                 'prefix' => $matchingAction['prefix'],
                                 'name' => $matchingAction['name']
                             ];
-                            $inputUrl = InputUrl::getUrl($actionPlaceholder = $actionPlaceholderValue);
+                            $inputUrl = InputUrl::getComponents($actionPlaceholder = $actionPlaceholderValue);
                         } else {
                             //actionPrefix SON PARAMETROS
                             $inputUrl->params = explode('/', $inputUrl->actionPrefix);
@@ -56,7 +96,7 @@ class Program
                     }
                 }
 
-                $usingUrl = InputUrl::parseUrl($inputUrl, $defaultUrl);
+                $usingUrl = UsingUrl::parseComponents($inputUrl, $defaultUrl);
 
                 $httpMethod = $_SERVER['REQUEST_METHOD'];
                 $actions = Program::$controllerReflection->getActionsHttpMethod($httpMethod);
@@ -82,7 +122,8 @@ class Program
                 //Es un Controller
                 if (!method_exists($controller, $actionName))  throw new ControllerException("'$actionName' action not found");
             }
-            Program::$actionReflection = new ActionReflectionUtils($controllerClassName, $actionName);
+
+            Program::$actionReflection = new ActionReflection($controllerClass, $actionName);
 
             // Check prefix  
             Program::checkPrefix($defaultUrl, $usingUrl);
@@ -95,9 +136,6 @@ class Program
             //Middlewares   
             Program::loadMiddlewares($body);
 
-            //Use model            
-            Program::loadModel($controller);
-
             //call action   
             $response = Program::callAction($controller, $actionName, $params);
 
@@ -108,7 +146,7 @@ class Program
             Program::handleError($e->getMessage(), $apiError = true);
         } catch (ControllerException $e) {
             Program::handleError($e->getMessage(), $apiError = false);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Program::handleError($e->getMessage());
         }
     }
@@ -129,25 +167,19 @@ class Program
             $usingRoute = Path::appendIfNotEmpty($usingRoute, '/') . $usingUrl->actionPrefix;
         }
 
-        // echo $route . "<br>";
-        // echo $usingRoute . "<br>";
-
-
         if ($route != $usingRoute) {
             if (Program::$controllerReflection->isApi()) throw new ApiException("Api route not found");
-            else  throw new Exception("Route not found");
+            else  throw new \Exception("Route not found");
         }
-
-        //. $controllerName. $action_prefix
-
     }
     private static function loadMiddlewares($middlewareParam)
     {
         $middlewares = array_merge(Program::$controllerReflection->getMiddlewares(), Program::$actionReflection->getMiddlewares()); //Unimos los middlewares del controllery action
 
         foreach ($middlewares as $midd) {
-            require_once Path::getPathMiddlewares($midd);
-            $middleware = new $midd();
+            $middlewareClass = NamespaceManager::$middlewares . $midd;
+
+            $middleware = new $middlewareClass();
             $middleware->handle($middlewareParam);
         }
     }
@@ -159,25 +191,11 @@ class Program
         $body = new Body(empty($_POST) ? empty($json) ? $_GET : $json : $_POST);
         return $body;
     }
-    private static function loadModel($controller)
-    {
-        $modelName = Program::$controllerReflection->getModel(); //If is empty, model has same name controller
-        //Maybe defaultModel  not exists 
-        if (file_exists(Path::getPathModel($modelName))) {
-            require_once Path::getPathModel($modelName);
-            $modelClassName = $modelName . 'Model';
-
-            //database
-            $modelReflection = new ModelReflectionUtils($modelClassName);
-            $db = $modelReflection->getDatabase();
-            $controller->model = new $modelClassName($db);
-        }
-    }
 
     private static function handleError($message, $apiError = false)
     {
-        require_once Path::getPathController('error');
-        $errorController = new ErrorController();
+        $errorControllerClass = NamespaceManager::$controllers . "Error";
+        $errorController = new $errorControllerClass();
         if (!$apiError) {
             $response = $errorController->index($message);
             $response?->render();
@@ -203,12 +221,12 @@ class Program
         //PRIMERA VERIFICACION:
         if (count($urlParams) > count($allParameters)) {
             $methodString = Program::$actionReflection->toString($allParameters, $urlParams);
-            throw new Exception("Too many parameters for $methodString");
+            throw new \Exception("Too many parameters for $methodString");
         }
 
         if (count($urlParams) < count($valuelessParameters)) {
             $methodString = Program::$actionReflection->toString($allParameters, $urlParams);
-            throw new Exception("Few parameters for $methodString");
+            throw new \Exception("Few parameters for $methodString");
         }
 
         if ($bodyParam !== null) {
@@ -235,7 +253,7 @@ class Program
 
         if (!empty($paramsNullValue)) {
             $methodString = Program::$actionReflection->toString($allParameters, $urlParams);
-            throw new Exception("Few parameters for $methodString");
+            throw new \Exception("Few parameters for $methodString");
         }
 
         $paramsValue = array_map(fn ($p) => $p['value'], $allParameters);

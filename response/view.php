@@ -1,4 +1,10 @@
 <?php
+
+namespace Framework\Response;
+
+use Framework\Utils\Routing\Path;
+use Framework\Utils\Url\DefaultUrl;
+
 class View
 {
     public $name;
@@ -25,18 +31,18 @@ class View
         $viewFound = null;
 
         if (pathinfo($viewPath, PATHINFO_EXTENSION) == "") {
-            $viewPath .= '*.{php,html}';
+            $viewPath .= '.{php,html}';
             $sameViews = glob($viewPath, GLOB_BRACE);
-
+            
             if (!empty($sameViews)) {
                 if (count($sameViews) == 1) $viewFound = $sameViews[0];
-                else throw new Exception("Multiple views found: <b>" . implode(', ', $sameViews) . "</b>");
+                else throw new \Exception("Multiple views found: <b>" . implode(', ', $sameViews) . "</b>");
             }
         } else {
             if (file_exists($viewPath)) $viewFound = $viewPath;
         }
 
-        if ($viewFound == null) throw new Exception("'$this->name' View not found");
+        if ($viewFound == null) throw new \Exception("'$this->name' View not found");
 
         return $viewFound;
     }
@@ -63,7 +69,7 @@ class View
         if ($this->useTemplate) require_once Path::getPathView('shared') . '/template.php';
         else {
             extract(View::$vars);
-            require $viewPath;
+            require_once $viewPath;
         }
     }
 }

@@ -1,17 +1,21 @@
 <?php
 
-//getRouteTo debe recibir los aprasmetros string: 4/5/ y no array
+namespace Framework\Utils\Routing;
+
+use Framework\Utils\Reflection\ControllerReflection;
+use Framework\Utils\Reflection\ActionReflection;
+use Framework\Utils\Url\DefaultUrl;
+use Framework\Utils\Routing\NamespaceManager;
 
 class Router
 {
     static function getRouteTo($controllerName, $actionName, $paramsString)
     {
-
         //Reflection
-        $controllerClassName = $controllerName . 'Controller';
+        //$controllerClassName = $controllerName . 'Controller';
 
-        $controllerReflection = new ControllerReflectionUtils($controllerClassName);
-        $actionReflection = new ActionReflectionUtils($controllerClassName, $actionName);
+        $controllerReflection = new ControllerReflection(NamespaceManager::$controllers . $controllerName);
+        $actionReflection = new ActionReflection(NamespaceManager::$controllers . $controllerName, $actionName);
 
 
         $controllerPrefix = $controllerReflection->getPrefix();

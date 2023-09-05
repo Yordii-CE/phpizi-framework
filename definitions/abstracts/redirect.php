@@ -1,4 +1,7 @@
 <?php
+
+namespace Framework\Definitions\Abstracts;
+
 abstract class Redirect
 {
     public $url;

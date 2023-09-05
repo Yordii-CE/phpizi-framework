@@ -1,25 +1,17 @@
 <?php
-require_once 'core/framework.php';
-//Core
-Framework::requireFolder("definitions/abstracts");
-Framework::requireFolder("definitions/annotations");
-Framework::requireFolder("definitions/interfaces");
-Framework::requireFolder("utils/reflection");
-Framework::requireFolder("utils/routing");
-Framework::requireFolder("utils/url");
-Framework::requireFolder("cors");
-Framework::requireFolder("database");
-Framework::requireFolder("globals");
-Framework::requireFolder("middleware");
-Framework::requireFolder("response");
-Framework::requireFolder("exceptions/");
-Framework::requireFolder("dev/");
+require_once 'autoload.php';
 
-//App
-require_once 'core/app.php';
-App::requireControllers();
-App::requireFolder('libs');
+//GLOBALS FUNCTIONS FOR APP
+require_once 'framework/global_funcs/json.php';
+require_once 'framework/global_funcs/redirectToAction.php';
+require_once 'framework/global_funcs/redirectToUrl.php';
+require_once 'framework/global_funcs/render.php';
+require_once 'framework/global_funcs/to.php';
+require_once 'framework/global_funcs/view.php';
 
-require_once 'core/program.php';
+
 require_once 'app/main.php';
+
+use Framework\Core\Program;
+
 Program::start();

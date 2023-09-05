@@ -23,14 +23,15 @@ REM BFCPEOPTIONEND
 @echo off
 setlocal
 
-SET fileName=%1
+SET name=%1
 SET model=true
 SET view=true
 
-IF "%fileName%"=="" (
+IF "%name%"=="" (
   echo Error: Missing name
   exit /b
 )
+
 
 IF "%~2"=="-false" (
     SET model= false
@@ -50,39 +51,98 @@ IF "%~3" NEQ "-true" IF "%~3" NEQ "-false" IF NOT "%~3"=="" (
     exit /b
 )
 
-
-SET className=%fileName%
+REM Capitalize
+SET name=%name%
 cd "app\controllers\"
 For /f %%A in ('
-  Powershell -NoP -C "$Env:fileName.Substring(0,1).ToUpper()+$Env:fileName.Substring(1).ToLower()"
-') do set className=%%A
-
+  Powershell -NoP -C "$Env:name.Substring(0,1).ToUpper()+$Env:name.Substring(1)"
+') do set name=%%A
 
 IF "%view%"=="true" (
-  REM Creating controller VIEW
-  echo ^<?php > %fileName%.controller.php
-  echo class %className%Controller extends Controller >> %fileName%.controller.php
-  echo ^{ >> %fileName%.controller.php
-  echo    function index^(^) : View>> %fileName%.controller.php
-  echo    { >> %fileName%.controller.php
-  echo        return view^(^); >> %fileName%.controller.php
-  echo    } >> %fileName%.controller.php
-  echo ^} >> %fileName%.controller.php
-  echo Successfully created controller
+  IF "%model%"=="true" (
+    REM Creating controller VIEW WITH MODEL
+    echo ^<?php > %name%.php
+    echo. >> %name%.php
+    echo namespace App\Controllers; >> %name%.php
+    echo. >> %name%.php
+    echo use Framework\Definitions\Abstracts\Controller; >> %name%.php
+    echo use App\Models\%name% as %name%Model; >> %name%.php
+    echo. >> %name%.php
+    echo class %name% extends Controller >> %name%.php
+    echo ^{ >> %name%.php
+    echo    public $model; >> %name%.php
+    echo    function __construct^(%name%Model $model^)>> %name%.php
+    echo    { >> %name%.php
+    echo      $this-^>model = $model; >> %name%.php
+    echo    } >> %name%.php
+    echo    function index^(^)>> %name%.php
+    echo    { >> %name%.php
+    echo        return view^(false, ['data'=^>$this-^>model-^>getAll^(^)]^); >> %name%.php
+    echo    } >> %name%.php
+    echo ^} >> %name%.php
+    echo Successfully created controller
+  ) ELSE (
+    REM Creating controller VIEW
+    echo ^<?php > %name%.php
+    echo. >> %name%.php
+    echo namespace App\Controllers; >> %name%.php    
+    echo. >> %name%.php
+    echo use Framework\Definitions\Abstracts\Controller; >> %name%.php
+    echo. >> %name%.php
+    echo class %name% extends Controller >> %name%.php
+    echo ^{ >> %name%.php
+    echo    function index^(^)>> %name%.php
+    echo    { >> %name%.php
+    echo        return view^(false^); >> %name%.php
+    echo    } >> %name%.php
+    echo ^} >> %name%.php
+    echo Successfully created controller
+  )
 
 ) ELSE (
-  REM Creating controller API
-  echo ^<?php > %fileName%.controller.php
-  echo use Core\Annotations\http\Get; >> %fileName%.controller.php
-  echo class %className%Controller extends Api >> %fileName%.controller.php
-  echo ^{ >> %fileName%.controller.php
-  echo    #[Get] >> %fileName%.controller.php
-  echo    function getAll^(^) : Json>> %fileName%.controller.php
-  echo    { >> %fileName%.controller.php
-  echo        return json^('Hello world!'^); >> %fileName%.controller.php
-  echo    } >> %fileName%.controller.php
-  echo ^} >> %fileName%.controller.php
-  echo Successfully created api controller
+    IF "%model%"=="true" (
+      REM Creating controller API  WITH MODEL
+      echo ^<?php > %name%.php
+      echo. >> %name%.php
+      echo namespace App\Controllers; >> %name%.php
+      echo. >> %name%.php
+      echo use Framework\Definitions\Abstracts\Api; >> %name%.php
+      echo use Framework\Definitions\Annotations\HttpMethods\Get; >> %name%.php
+      echo use App\Models\%name% as %name%Model; >> %name%.php      
+      echo. >> %name%.php
+      echo class %name% extends Api >> %name%.php
+      echo ^{ >> %name%.php
+      echo    public $model; >> %name%.php
+      echo    function __construct^(%name%Model $model^)>> %name%.php
+      echo    { >> %name%.php
+      echo      $this-^>model = $model; >> %name%.php
+      echo    } >> %name%.php
+      echo    #[Get] >> %name%.php
+      echo    function index^(^)>> %name%.php
+      echo    { >> %name%.php
+      echo        return json^($this-^>model-^>getAll^(^)^); >> %name%.php
+      echo    } >> %name%.php
+      echo ^} >> %name%.php
+      echo Successfully created api controller
+    ) ELSE (
+      REM Creating controller API
+      echo ^<?php > %name%.ph
+      echo. >> %name%.phpp
+      echo namespace App\Controllers; >> %name%.php
+      echo. >> %name%.php
+      echo use Framework\Definitions\Abstracts\Api; >> %name%.php
+      echo use Framework\Definitions\Annotations\HttpMethods\Get; >> %name%.php
+      echo. >> %name%.php
+      echo class %name% extends Api >> %name%.php
+      echo ^{ >> %name%.php
+      echo    #[Get] >> %name%.php
+      echo    function index^(^)>> %name%.php
+      echo    { >> %name%.php
+      echo        return json^(['Hello world!']^); >> %name%.php
+      echo    } >> %name%.php
+      echo ^} >> %name%.php
+      echo Successfully created api controller
+    )
 
 )
 
@@ -91,14 +151,17 @@ IF "%model%"=="true" (
   REM Creating model file
   cd ".."
   cd "models/"
-  echo ^<?php > %fileName%.model.php
-  echo class %className%Model >> %fileName%.model.php
-  echo ^{ >> %fileName%.model.php
-  echo    function getData^(^)>> %fileName%.model.php
-  echo    { >> %fileName%.model.php
-  echo        return [1,2,3]; >> %fileName%.model.php
-  echo    } >> %fileName%.model.php
-  echo ^} >> %fileName%.model.php
+  echo ^<?php > %name%.php
+  echo. >> %name%.php
+  echo namespace App\Models; >> %name%.php
+  echo. >> %name%.php
+  echo class %name% >> %name%.php
+  echo ^{ >> %name%.php
+  echo    function getAll^(^)>> %name%.php
+  echo    { >> %name%.php
+  echo        return [1,2,3]; >> %name%.php
+  echo    } >> %name%.php
+  echo ^} >> %name%.php
 
   echo Successfully created model
 )
@@ -107,9 +170,11 @@ IF "%view%"=="true" (
   REM Creating view file
   cd ".."
   cd "views/"
-  mkdir %fileName%
-  cd %fileName%
-  echo %fileName% > index.php
+  mkdir %name%
+  cd %name%
+  echo %name% > Index.php
+  echo ^<br^> >> index.php
+  echo Data : ^<?php print_r^($data^)?^> >> index.php
 
   echo Successfully created view
 

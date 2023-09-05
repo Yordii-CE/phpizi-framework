@@ -8,8 +8,8 @@ IF "%controllerName%"=="" (
   exit /b
 )
 
-set "controllerPath=%controllerName%.controller.php"
-set "modelPath=%controllerName%.model.php"
+set "controllerPath=%controllerName%.php"
+set "modelPath=%controllerName%.php"
 set "viewPath=%controllerName%"
 
 

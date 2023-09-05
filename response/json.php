@@ -1,4 +1,7 @@
 <?php
+
+namespace Framework\Response;
+
 class Json
 {
     public $data;
@@ -9,8 +12,7 @@ class Json
     }
 
     function returnJson()
-    {
-        echo "<pre>";
-        echo json_encode($this->data);
+    {        
+        echo "<pre>".json_encode($this->data)."</pre>";
     }
 }

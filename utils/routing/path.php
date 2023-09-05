@@ -1,5 +1,6 @@
 <?php
 
+namespace Framework\Utils\Routing;
 //Only for App, not for Core
 class Path
 {
@@ -51,6 +52,13 @@ class Path
     static function appendIfNotEmpty($path, $char)
     {
         if (!empty($path)) return $path . $char;
+        return $path;
+    }
+    static function addCharacterToEndIfNeeded($path, $char)
+    {
+        if (substr($path, -1) !== $char) {
+            $path .= $char;
+        }
         return $path;
     }
 }
