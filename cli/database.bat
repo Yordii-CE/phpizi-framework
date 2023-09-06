@@ -1,45 +1,28 @@
-@ECHO OFF
-REM BFCPEOPTIONSTART
-REM Advanced BAT to EXE Converter www.BatToExeConverter.com
-REM BFCPEEXE=C:\xampp\htdocs\easyflow\izi.exe
-REM BFCPEICON=
-REM BFCPEICONINDEX=-1
-REM BFCPEEMBEDDISPLAY=0
-REM BFCPEEMBEDDELETE=1
-REM BFCPEADMINEXE=0
-REM BFCPEINVISEXE=0
-REM BFCPEVERINCLUDE=0
-REM BFCPEVERVERSION=1.0.0.0
-REM BFCPEVERPRODUCT=Product Name
-REM BFCPEVERDESC=Product Description
-REM BFCPEVERCOMPANY=Your Company
-REM BFCPEVERCOPYRIGHT=Copyright Info
-REM BFCPEWINDOWCENTER=1
-REM BFCPEDISABLEQE=0
-REM BFCPEWINDOWHEIGHT=25
-REM BFCPEWINDOWWIDTH=80
-REM BFCPEWTITLE=Window Title
-REM BFCPEOPTIONEND
 @echo off
 setlocal
 
 SET name=%1
-SET type=Mysql
+SET type=MySql
 
 IF "%name%"=="" (
-  echo Error: Missing database name
+  echo Error: Missing database name.
   exit /b
 )
 
-IF "%~2"=="-Mysql" (
-    SET type=Mysql
+IF NOT "%~3"=="" (
+  echo Error: Too many parameters, 2 given, expect 1.
+  exit /b
+)
+
+IF "%~2"=="-MySql" (
+    SET type=MySql
 )
 IF "%~2"=="-SqlSvr" (
     SET type=SqlSvr
 )
 
-IF "%~2" NEQ "-Mysql" IF "%~2" NEQ "-SqlSvr" IF NOT "%~2"=="" (
-    echo Error: Wrong database type
+IF "%~2" NEQ "-MySql" IF "%~2" NEQ "-SqlSvr" IF NOT "%~2"=="" (
+    echo Error: Wrong database type, valid: [^-MySql^, -SqlSvr^].
     exit /b
 )
 
@@ -69,4 +52,6 @@ echo        $this-^>password = '';>> %name%.php
 echo        $this-^>charset = 'utf8';>> %name%.php
 echo    } >> %name%.php
 echo ^} >> %name%.php
-echo Successfully created database
+echo Successfully created database.
+
+endlocal

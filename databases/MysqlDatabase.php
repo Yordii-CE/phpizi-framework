@@ -4,7 +4,7 @@ namespace Framework\Databases;
 
 use Framework\Definitions\Interfaces\IDatabase;
 
-class MysqlDatabase implements IDatabase
+class MySqlDatabase implements IDatabase
 {
     protected $host;
     protected $db_name;
