@@ -37,6 +37,12 @@ For /f %%A in ('
   Powershell -NoP -C "$Env:name.Substring(0,1).ToUpper()+$Env:name.Substring(1)"
 ') do set name=%%A
 
+REM Lower
+SET lowerName=%name%
+For /f %%A in ('
+  Powershell -NoP -C "$Env:lowerName.ToLower()"
+') do set lowerName=%%A
+
 IF "%model%"=="true" (
     REM Creating api WITH MODEL
     echo ^<?php > %name%.php
@@ -49,15 +55,15 @@ IF "%model%"=="true" (
     echo. >> %name%.php
     echo class %name% extends Api >> %name%.php
     echo ^{ >> %name%.php
-    echo    public $model; >> %name%.php
-    echo    function __construct^(%name%Model $model^)>> %name%.php
+    echo    public $%lowerName%Model; >> %name%.php
+    echo    function __construct^(%name%Model $%lowerName%Model^)>> %name%.php
     echo    { >> %name%.php
-    echo      $this-^>model = $model; >> %name%.php
+    echo      $this-^>%lowerName%Model = $%lowerName%Model; >> %name%.php
     echo    } >> %name%.php
     echo    #[Get] >> %name%.php
     echo    function index^(^)>> %name%.php
     echo    { >> %name%.php
-    echo        return json^($this-^>model-^>getAll^(^)^); >> %name%.php
+    echo        return json^($this-^>%lowerName%Model-^>getAll^(^)^); >> %name%.php
     echo    } >> %name%.php
     echo ^} >> %name%.php
     echo Successfully created api controller.
