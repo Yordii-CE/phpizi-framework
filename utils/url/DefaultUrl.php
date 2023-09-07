@@ -4,8 +4,7 @@ namespace Framework\Utils\Url;
 
 use Framework\Utils\Reflection\ControllerReflection;
 use Framework\Utils\Reflection\ActionReflection;
-use Framework\Utils\Routing\NamespaceManager;
-
+use Framework\Utils\Namespaces\ControllerNamespace;
 
 class DefaultUrl
 {
@@ -72,8 +71,10 @@ class DefaultUrl
         $actionPrefix = null;
 
         //Get prefix
-        $controllerReflection = new ControllerReflection(NamespaceManager::$controllers . $controller);
-        $actionReflection = new ActionReflection(NamespaceManager::$controllers . $controller, $action);
+        $controllerNamespace = ControllerNamespace::getNamespaceOf($controller);
+
+        $controllerReflection = new ControllerReflection($controllerNamespace . $controller);
+        $actionReflection = new ActionReflection($controllerNamespace . $controller, $action);
 
         $controllerPrefix = $controllerReflection->getPrefix();
         $actionPrefix = $actionReflection->getPrefix();

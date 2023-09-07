@@ -3,7 +3,7 @@
 use Framework\Definitions\Abstracts\Redirect;
 use Framework\Response\RedirectToAction;
 use Framework\Utils\Reflection\Meta;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\HelpersNamespaces;
 
 function redirectToAction(): Redirect
 {
@@ -13,7 +13,7 @@ function redirectToAction(): Redirect
 
     $args = func_get_args();
 
-    $controller = NamespaceManager::removeControllerNamespace(Meta::getCurrentController());
+    $controller = HelpersNamespaces::getClass(Meta::getCurrentController());
     $action = isset($args[0]) ? $args[0] : '';
 
     //params

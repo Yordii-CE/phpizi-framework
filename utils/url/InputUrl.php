@@ -3,7 +3,7 @@
 namespace Framework\Utils\Url;
 
 use Framework\Utils\Routing\Path;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\ControllerNamespace;
 
 class InputUrl
 {
@@ -106,7 +106,9 @@ class InputUrl
     {
         $controllerIndex = null;
         for ($i = 0; $i < count($url); $i++) {
-            if (class_exists(NamespaceManager::$controllers . $url[$i])) {
+            $controllerNamespace = ControllerNamespace::getNamespaceOf($url[$i]);
+
+            if (class_exists($controllerNamespace . $url[$i])) {
                 $controllerIndex = $i;
                 break;
             }
@@ -116,11 +118,12 @@ class InputUrl
 
     public static function findActionIndexInUrl($url, $controllerIndex): ?int
     {
-
         $controllerClassName = $url[$controllerIndex];
         $actionIndex = null;
         for ($i = $controllerIndex; $i < count($url); $i++) {
-            if (method_exists(NamespaceManager::$controllers . $controllerClassName, $url[$i])) {
+            $controllerNamespace = ControllerNamespace::getNamespaceOf($controllerClassName);
+
+            if (method_exists($controllerNamespace . $controllerClassName, $url[$i])) {
 
                 $actionIndex = $i;
                 break;

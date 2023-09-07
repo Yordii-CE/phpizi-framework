@@ -2,7 +2,8 @@
 
 use Framework\Response\View;
 use Framework\Utils\Reflection\Meta;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\HelpersNamespaces;
+
 
 function view(): View
 {
@@ -11,7 +12,7 @@ function view(): View
 
     $args = func_get_args();
 
-    $currentController = NamespaceManager::removeControllerNamespace(Meta::getCurrentController());
+    $currentController = HelpersNamespaces::getClass(Meta::getCurrentController());
     $viewName = $currentController . "/" . Meta::getCurrentAction();
     $model = null;
     $useTemplate = true;

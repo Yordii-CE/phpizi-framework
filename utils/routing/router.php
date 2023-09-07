@@ -5,17 +5,17 @@ namespace Framework\Utils\Routing;
 use Framework\Utils\Reflection\ControllerReflection;
 use Framework\Utils\Reflection\ActionReflection;
 use Framework\Utils\Url\DefaultUrl;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\ControllerNamespace;
 
 class Router
 {
     static function getRouteTo($controllerName, $actionName, $paramsString)
     {
-        //Reflection
-        //$controllerClassName = $controllerName . 'Controller';
+        //Reflection        
+        $controllerNamespace = ControllerNamespace::getNamespaceOf($controllerName);
 
-        $controllerReflection = new ControllerReflection(NamespaceManager::$controllers . $controllerName);
-        $actionReflection = new ActionReflection(NamespaceManager::$controllers . $controllerName, $actionName);
+        $controllerReflection = new ControllerReflection($controllerNamespace . $controllerName);
+        $actionReflection = new ActionReflection($controllerNamespace . $controllerName, $actionName);
 
 
         $controllerPrefix = $controllerReflection->getPrefix();

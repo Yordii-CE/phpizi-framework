@@ -11,7 +11,10 @@ use Framework\Definitions\Annotations\HttpMethods\Get;
 use Framework\Definitions\Annotations\HttpMethods\Post;
 use Framework\Definitions\Annotations\HttpMethods\Put;
 use Framework\Definitions\Annotations\HttpMethods\Delete;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\HelpersNamespaces;
+use Framework\Utils\Namespaces\FrameworkNamespaces;
+
+
 
 class ControllerReflection extends ReflectionUtils
 {
@@ -43,8 +46,7 @@ class ControllerReflection extends ReflectionUtils
 
             $middsattributes = $attributes[0]->newInstance()->middlewares;
             foreach ($middsattributes as $midd) {
-                $midd = NamespaceManager::removeMiddlewareNamespace($midd);
-                $middPath = Path::getPathMiddlewares($midd);
+                $middPath = HelpersNamespaces::convertToPath($midd);
                 if (!file_exists($middPath)) throw new \Exception("'$midd' Middleware not found");
 
                 array_push($middlewares, $midd);
@@ -57,7 +59,7 @@ class ControllerReflection extends ReflectionUtils
     function isApi()
     {
         $controllerClassName = $this->reflection->getName();
-        return is_subclass_of($controllerClassName, NamespaceManager::$abstracts . 'Api');
+        return is_subclass_of($controllerClassName, FrameworkNamespaces::$abstracts . 'Api');
     }
     function getActionsHttpMethod($httpMethod): array
     {

@@ -15,7 +15,8 @@ use Framework\Definitions\Abstracts\Redirect;
 use Framework\Utils\Reflection\ControllerReflection;
 use Framework\Utils\Reflection\ActionReflection;
 use Framework\Utils\Reflection\ModelReflection;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\ControllerNamespace;
+use Framework\Utils\Namespaces\MiddlewareNamespace;
 
 class Program
 {
@@ -59,7 +60,8 @@ class Program
             $inputUrl = InputUrl::getComponents();
             $usingUrl = UsingUrl::parseComponents($inputUrl, $defaultUrl);
 
-            $controllerClass = NamespaceManager::$controllers . $usingUrl->controller;
+            $controllerNamespace = ControllerNamespace::getNamespaceOf($usingUrl->controller);
+            $controllerClass = $controllerNamespace . $usingUrl->controller;
             $actionName = $usingUrl->action;
 
             //Controller 
@@ -174,10 +176,11 @@ class Program
     }
     private static function loadMiddlewares($middlewareParam)
     {
-        $middlewares = array_merge(Program::$controllerReflection->getMiddlewares(), Program::$actionReflection->getMiddlewares()); //Unimos los middlewares del controllery action
+        //Unimos los middlewares del controller action
+        $middlewares = array_merge(Program::$controllerReflection->getMiddlewares(), Program::$actionReflection->getMiddlewares());
 
         foreach ($middlewares as $midd) {
-            $middlewareClass = NamespaceManager::$middlewares . $midd;
+            $middlewareClass =  $midd; //Ya vienen con namespace
 
             $middleware = new $middlewareClass();
             $middleware->handle($middlewareParam);
@@ -194,7 +197,8 @@ class Program
 
     private static function handleError($message, $apiError = false)
     {
-        $errorControllerClass = NamespaceManager::$controllers . "Error";
+        $controllerNamespace = ControllerNamespace::getNamespaceOf("Error");
+        $errorControllerClass = $controllerNamespace . "Error";
         $errorController = new $errorControllerClass();
         if (!$apiError) {
             $response = $errorController->index($message);

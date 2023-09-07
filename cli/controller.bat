@@ -2,8 +2,8 @@
 setlocal
 
 SET name=%1
-SET model=true
-SET view=true
+SET model=false
+SET view=false
 
 IF "%name%"=="" (
   echo Error: Missing controller name.

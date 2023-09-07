@@ -5,7 +5,8 @@ namespace Framework\Utils\Reflection;
 use Framework\Definitions\Annotations\Routing\Prefix;
 use Framework\Definitions\Annotations\Request\Middlewares;
 use Framework\Definitions\Abstracts\ReflectionUtils;
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\ControllerNamespace;
+use Framework\Utils\Namespaces\HelpersNamespaces;
 use Framework\Utils\Routing\Path;
 
 
@@ -51,13 +52,13 @@ class ActionReflection extends ReflectionUtils
                 $paramInfo[] = [
                     'name' => $paramName,
                     'value' => $defaultValue,
-                    'type' => NamespaceManager::getOnlyClass($paramTypeString)
+                    'type' => HelpersNamespaces::getClass($paramTypeString)
                 ];
             }
             if ($filter == 'valueless') {
                 if ($defaultValue === null) {
                     //Si el tipo es Body no lo contamos como si no tuviera valor ya que el no lo recibe por url                                        
-                    if (NamespaceManager::getOnlyClass($paramTypeString) != 'Body') {
+                    if (HelpersNamespaces::getClass($paramTypeString) != 'Body') {
                         $paramInfo[] = [
                             'name' => $paramName,
                             'value' => $defaultValue,
@@ -166,8 +167,8 @@ class ActionReflection extends ReflectionUtils
 
             $middsattributes = $attributes[0]->newInstance()->middlewares;
             foreach ($middsattributes as $midd) {
-                $midd = NamespaceManager::removeMiddlewareNamespace($midd);
-                $middPath = Path::getPathMiddlewares($midd);
+                $middPath = HelpersNamespaces::convertToPath($midd);
+                //$middPath = Path::getPathMiddlewares($midd);
 
                 if (!file_exists($middPath)) throw new \Exception("'$midd' Middleware not found");
 

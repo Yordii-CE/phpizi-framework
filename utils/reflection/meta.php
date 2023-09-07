@@ -2,7 +2,9 @@
 
 namespace Framework\Utils\Reflection;
 
-use Framework\Utils\Routing\NamespaceManager;
+use Framework\Utils\Namespaces\FrameworkNamespaces;
+
+
 
 class Meta
 {
@@ -44,7 +46,7 @@ class Meta
                 if ($function == "__construct") throw new \Exception();
             }
             foreach ($classTypes as $classType) {
-                if (is_subclass_of($class, NamespaceManager::$abstracts . $classType)) return true;
+                if (is_subclass_of($class, FrameworkNamespaces::$abstracts . $classType)) return true;
             }
             throw new \Exception();
         } catch (\Exception $e) {

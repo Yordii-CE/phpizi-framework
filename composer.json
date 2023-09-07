@@ -1,10 +1,5 @@
 {
   "name": "phpizi/framework",
   "description": "MVC framework for PHP based on ASP MVC features",
-  "license": "MIT",
-  "scripts": {
-    "post-install-cmd": [
-      "php cli/post-install.php"
-    ]
-  }
+  "license": "MIT"
 }
