@@ -27,7 +27,7 @@ class Meta
         return $context['args'];
     }
 
-    public static function  validateFunctionContext(array $classTypes, $functionType) //__construct o action
+    public static function  validateFunctionContext(array $types, $functionType) //__construct o action
     {
         try {
             $context = debug_backtrace(false)[2];
@@ -45,13 +45,18 @@ class Meta
             } else {
                 if ($function == "__construct") throw new \Exception();
             }
-            foreach ($classTypes as $classType) {
-                if (is_subclass_of($class, FrameworkNamespaces::$abstracts . $classType)) return true;
+            foreach ($types as $type) {
+
+                //Extends
+                if (is_subclass_of($class, FrameworkNamespaces::$abstracts . $type)) return true;
+
+                //Implemets
+                if (is_subclass_of($class, FrameworkNamespaces::$interfaces . $type)) return true;
             }
             throw new \Exception();
         } catch (\Exception $e) {
-            $classTypesString = implode(', ', $classTypes);
-            return "'$utilFunctionName()'can only be run in the $functionType of [$classTypesString]";
+            $typesString = implode(', ', $types);
+            return "'$utilFunctionName()'can only be run in the $functionType of [$typesString]";
         }
     }
 }

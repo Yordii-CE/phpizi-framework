@@ -7,7 +7,7 @@ use Framework\Utils\Namespaces\HelpersNamespaces;
 
 function redirectToAction(): Redirect
 {
-    $inContext = Meta::validateFunctionContext(["Controller", "Api"], "action");
+    $inContext = Meta::validateFunctionContext(["Controller", "Api", 'IMiddleware'], "action");
 
     if ($inContext !== true)  throw new \Exception($inContext);
 

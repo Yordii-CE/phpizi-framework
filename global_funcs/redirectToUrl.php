@@ -6,7 +6,7 @@ use Framework\Utils\Reflection\Meta;
 
 function redirectToUrl($url): Redirect
 {
-    $inContext = Meta::validateFunctionContext(["Controller", "Api"], "action");
+    $inContext = Meta::validateFunctionContext(["Controller", "Api", 'IMiddleware'], "action");
 
     if ($inContext !== true)  throw new \Exception($inContext);
 

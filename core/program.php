@@ -174,7 +174,7 @@ class Program
             else  throw new \Exception("Route not found");
         }
     }
-    private static function loadMiddlewares($middlewareParam)
+    private static function loadMiddlewares($middlewareParam) // $middlewareParam is Body
     {
         //Unimos los middlewares del controller action
         $middlewares = array_merge(Program::$controllerReflection->getMiddlewares(), Program::$actionReflection->getMiddlewares());
@@ -183,7 +183,8 @@ class Program
             $middlewareClass =  $midd; //Ya vienen con namespace
 
             $middleware = new $middlewareClass();
-            $middleware->handle($middlewareParam);
+            $return = $middleware->handle($middlewareParam);
+            if ($return instanceof Redirect) $return?->redirect();
         }
     }
     private static function getActionBodyParam()
