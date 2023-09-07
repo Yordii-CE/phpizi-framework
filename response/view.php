@@ -33,7 +33,7 @@ class View
         if (pathinfo($viewPath, PATHINFO_EXTENSION) == "") {
             $viewPath .= '.{php,html}';
             $sameViews = glob($viewPath, GLOB_BRACE);
-            
+
             if (!empty($sameViews)) {
                 if (count($sameViews) == 1) $viewFound = $sameViews[0];
                 else throw new \Exception("Multiple views found: <b>" . implode(', ', $sameViews) . "</b>");
@@ -55,7 +55,7 @@ class View
         $ACTION = explode('.', basename($this->name))[0]; // Obtiene el nombre de la acción
         $BASE_URL = Path::getProjectPath() . DefaultUrl::$defaultPrefix;
 
-        require_once 'app/views/shared/vars.php';
+        require_once 'app/views/shared/globals.php';
 
         //Necesito las variables para RENDER()
         $vars = compact('PUBLIC', 'THIS', 'ACTION', 'BASE_URL');
