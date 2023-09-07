@@ -11,12 +11,12 @@ IF "%name%"=="" (
 )
 
 
-IF "%~2"=="-false" (
-    SET model=false
+IF "%~2"=="-true" (
+    SET model=true
 )
 
-IF "%~3"=="-false" (
-    SET view=false
+IF "%~3"=="-true" (
+    SET view=true
 )
 
 IF NOT "%~4"=="" (
@@ -37,7 +37,7 @@ IF "%~3" NEQ "-true" IF "%~3" NEQ "-false" IF NOT "%~3"=="" (
 
 REM Capitalize
 SET name=%name%
-cd "app\controllers\"
+cd "app/controllers/"
 For /f %%A in ('
   Powershell -NoP -C "$Env:name.Substring(0,1).ToUpper()+$Env:name.Substring(1)"
 ') do set name=%%A
@@ -66,7 +66,9 @@ IF "%model%"=="true" (
   echo    } >> %name%.php
   echo    function index^(^)>> %name%.php
   echo    { >> %name%.php
-  echo        return view^(false, ['data'=^>$this-^>%lowerName%Model-^>getAll^(^)]^); >> %name%.php
+  IF "%view%"=="true" (
+    echo        return view^(false, ['data'=^>$this-^>%lowerName%Model-^>getAll^(^)]^); >> %name%.php
+  )
   echo    } >> %name%.php
   echo ^} >> %name%.php
   echo Successfully created controller.
@@ -82,42 +84,26 @@ IF "%model%"=="true" (
   echo ^{ >> %name%.php
   echo    function index^(^)>> %name%.php
   echo    { >> %name%.php
-  echo        return view^(false^); >> %name%.php
+  IF "%view%"=="true" (
+    echo        return view^(false^); >> %name%.php
+  )
   echo    } >> %name%.php
   echo ^} >> %name%.php
   echo Successfully created controller.
 )
 
+
+
 IF "%model%"=="true" (
   REM Creating model
-  cd ".."
-  cd "models/"
-  echo ^<?php > %name%.php
-  echo. >> %name%.php
-  echo namespace App\Models; >> %name%.php
-  echo. >> %name%.php
-  echo class %name% >> %name%.php
-  echo ^{ >> %name%.php
-  echo    function getAll^(^)>> %name%.php
-  echo    { >> %name%.php
-  echo        return [1,2,3]; >> %name%.php
-  echo    } >> %name%.php
-  echo ^} >> %name%.php
-
-  echo Successfully created model.
+  cd "../models"
+  call %~dp0model.bat %name%
 )
 
+cd "../views"
 IF "%view%"=="true" (
   REM Creating view
-  cd ".."
-  cd "views/"
-  mkdir %name%
-  cd %name%
-  echo %name% > Index.php
-  echo ^<br^> >> index.php
-  echo Data : ^<?php print_r^($data^)?^> >> index.php
-
-  echo Successfully created view.
+  call %~dp0view.bat %name%
 
 )
 endlocal

@@ -29,7 +29,7 @@ IF "%~2" NEQ "-MySql" IF "%~2" NEQ "-SqlSvr" IF NOT "%~2"=="" (
 REM Capitalize
 SET name=%name%
 REM cd "app\%database_or_middleware%s\"
-cd "app\databases\"
+cd "app/databases/"
 For /f %%A in ('
   Powershell -NoP -C "$Env:name.Substring(0,1).ToUpper()+$Env:name.Substring(1).ToLower()"
 ') do set name=%%A

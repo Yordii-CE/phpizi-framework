@@ -9,7 +9,7 @@ IF "%controllerName%"=="" (
 )
 
 IF NOT "%~2"=="" (
-  echo Error: Too many parameters, 2 given, expect 0.
+  echo Error: Too many parameters, 1 given, expect 0.
   exit /b
 )
 
@@ -19,7 +19,7 @@ set "viewPath=%controllerName%"
 
 
 REM Removing controller
-cd "app\controllers\"
+cd "app/controllers/"
 if exist "%controllerPath%" (
     del "%controllerPath%"
     echo Successfully removed controller. 

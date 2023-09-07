@@ -32,7 +32,7 @@ IF "%~2" NEQ "-true" IF "%~2" NEQ "-false" IF NOT "%~2"=="" (
 
 REM Capitalize
 SET name=%name%
-cd "app\controllers\"
+cd "app/controllers/"
 For /f %%A in ('
   Powershell -NoP -C "$Env:name.Substring(0,1).ToUpper()+$Env:name.Substring(1)"
 ') do set name=%%A
@@ -87,24 +87,10 @@ IF "%model%"=="true" (
     echo Successfully created api controller.
 )
 
-
 IF "%model%"=="true" (
-  REM Creating model file
-  cd ".."
-  cd "models/"
-  echo ^<?php > %name%.php
-  echo. >> %name%.php
-  echo namespace App\Models; >> %name%.php
-  echo. >> %name%.php
-  echo class %name% >> %name%.php
-  echo ^{ >> %name%.php
-  echo    function getAll^(^)>> %name%.php
-  echo    { >> %name%.php
-  echo        return [1,2,3]; >> %name%.php
-  echo    } >> %name%.php
-  echo ^} >> %name%.php
-
-  echo Successfully created model.
+  REM Creating model
+  cd "../models"
+  call %~dp0model.bat %name%
 )
 
 endlocal
