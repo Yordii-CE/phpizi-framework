@@ -9,15 +9,18 @@ use Framework\Utils\Hash;
 
 class App
 {
-    private static $starting = false;
+    private static $controllersStarted = false;
+    private static $matchUrlStarted = false;
     public static function controllers(array $controllers)
     {
-        if (App::$starting) die("The app should not start yet");
         Hash::createControllerHash($controllers);
+        App::$controllersStarted = true;
     }
     public static function startApp()
     {
-        App::$starting = true;
+        if (!App::$matchUrlStarted) die("Initialize match url");
+        if (!App::$controllersStarted) die("Initialize controllers");
+
         //GLOBALS FUNCTIONS FOR APP
         require_once __DIR__ . '/../global_funcs/json.php';
         require_once __DIR__ . '/../global_funcs/redirectToAction.php';
@@ -31,7 +34,7 @@ class App
     }
     public static function matchUrl($pattern)
     {
-        if (App::$starting) die("The app should not start yet");
         DefaultUrl::$pattern = $pattern;
+        App::$matchUrlStarted = true;
     }
 }
