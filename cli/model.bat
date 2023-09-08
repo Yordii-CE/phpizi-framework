@@ -13,8 +13,15 @@ IF NOT "%~2"=="" (
   exit /b
 )
 
-REM Creating model
+REM Capitalize
+SET name=%name%
 cd "app/models/"
+For /f %%A in ('
+  Powershell -NoP -C "$Env:name.Substring(0,1).ToUpper()+$Env:name.Substring(1)"
+') do set name=%%A
+
+REM Creating model
+
 echo ^<?php > %name%.php
 echo. >> %name%.php
 echo namespace App\Models; >> %name%.php
