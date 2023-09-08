@@ -2,7 +2,7 @@
 setlocal
 
 SET name=%1
-SET model=true
+SET model=false
 
 
 IF "%name%"=="" (
