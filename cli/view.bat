@@ -26,5 +26,4 @@ cd %name%
 echo  ^<h4^> %name%  ^</h4^> >> Index.php
 
 echo Successfully created view.
-
 endlocal

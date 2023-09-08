@@ -21,7 +21,6 @@ For /f %%A in ('
 ') do set name=%%A
 
 REM Creating model
-
 echo ^<?php > %name%.php
 echo. >> %name%.php
 echo namespace App\Models; >> %name%.php
