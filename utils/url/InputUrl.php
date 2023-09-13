@@ -120,7 +120,8 @@ class InputUrl
     {
         $controllerClassName = $url[$controllerIndex];
         $actionIndex = null;
-        for ($i = $controllerIndex; $i < count($url); $i++) {
+        //$controllerIndex +1 ya que puedo tener metodos con el mismo nombre de clase
+        for ($i = $controllerIndex + 1; $i < count($url); $i++) {
             $controllerNamespace = ControllerNamespace::getNamespaceOf($controllerClassName);
 
             if (method_exists($controllerNamespace . $controllerClassName, $url[$i])) {
