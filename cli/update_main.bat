@@ -27,7 +27,7 @@ set "controller_class=    %controller%::class,"
     )
 )) > "tempfile.php"
 
-move /y "tempfile.php" "main.php"
+move /y "tempfile.php" "main.php" > nul
 
 echo Update Main.php.
 
