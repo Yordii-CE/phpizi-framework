@@ -69,7 +69,9 @@ IF "%model%"=="true" (
   IF "%view%"=="true" (
     echo        return view^(false, ['data'=^>$this-^>%lowerName%Model-^>getAll^(^)]^); >> %name%.php
   )
-
+  echo    } >> %name%.php
+  echo ^} >> %name%.php
+  echo Successfully created controller.
 ) ELSE (
   REM Creating controller
   echo ^<?php > %name%.php
@@ -85,11 +87,12 @@ IF "%model%"=="true" (
   IF "%view%"=="true" (
     echo        return view^(false^); >> %name%.php
   )
+  echo    } >> %name%.php
+  echo ^} >> %name%.php
+  echo Successfully created controller.
 )
 
-echo    } >> %name%.php
-echo ^} >> %name%.php
-echo Successfully created controller.
+
 
 IF "%model%"=="true" (
   REM Creating model
@@ -97,10 +100,14 @@ IF "%model%"=="true" (
   call %~dp0model.bat %name%
 )
 
-cd "../views"
 IF "%view%"=="true" (
   REM Creating view
+  cd "../views"
   call %~dp0view.bat %name%
 
 )
+
+REM Updating main.php
+cd "../../"
+call %~dp0update_main.bat %name%
 endlocal
