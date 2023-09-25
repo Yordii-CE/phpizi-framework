@@ -28,6 +28,7 @@ class App
         require_once __DIR__ . '/../global_funcs/render.php';
         require_once __DIR__ . '/../global_funcs/to.php';
         require_once __DIR__ . '/../global_funcs/view.php';
+        require_once __DIR__ . '/../global_funcs/include_file.php';
 
         require_once 'app/main.php';
         Program::start();
